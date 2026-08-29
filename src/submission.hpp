@@ -2,6 +2,7 @@
 
 #include <cstddef>
 #include <vector>
+#include <cstring>
 
 // Starter Grid for the 2D heat-diffusion problem.
 //
@@ -41,12 +42,10 @@ void apply_stencil(const Grid& old_grid, Grid& new_grid){
   const double* oldData = old_grid.data();
   double* newData = new_grid.data();
 
-  // top/bottom rows
-  const std::size_t bottomStart = (numRows - 1) * numCols;
-  for(std::size_t j = 0; j < numCols; ++j){
-    newData[j] = oldData[j];
-    newData[bottomStart + j] = oldData[bottomStart + j];
-  }
+  // copy top/bottom rows
+  std::memcpy(newData, oldData, numCols * sizeof(double));
+  std::memcpy(newData + numCols * (numRows - 1), oldData + numCols * (numRows - 1),
+              numCols * sizeof(double));
 
   // calculate new_grid interior points using weighted average
   #pragma omp parallel for
