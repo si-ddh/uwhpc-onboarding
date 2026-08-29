@@ -41,15 +41,6 @@ void apply_stencil(const Grid& old_grid, Grid& new_grid){
   const double* oldData = old_grid.data();
   double* newData = new_grid.data();
 
-  // copy boundary points from old_grid unchanged
-
-  // leftmost/rightmost columns
-  for(std::size_t i = 0; i < numRows; ++i){
-    const std::size_t rowStart = i * numCols;
-    newData[rowStart] = oldData[rowStart];
-    newData[rowStart + numCols - 1] = oldData[rowStart + numCols - 1]; 
-  }
-
   // top/bottom rows
   const std::size_t bottomStart = (numRows - 1) * numCols;
   for(std::size_t j = 0; j < numCols; ++j){
@@ -64,6 +55,11 @@ void apply_stencil(const Grid& old_grid, Grid& new_grid){
     const double* curr = oldData + i * numCols;
     const double* next = oldData + (i + 1) * numCols;
     double* out = newData + i * numCols;
+
+    // copy left and right boundary of row
+    out[0] = curr[0];
+    out[numCols - 1] = curr[numCols - 1];
+
     for(std::size_t j = 1; j < numCols - 1; ++j){
       out[j] = 0.5 * curr[j]
               + 0.125 * (prev[j] + curr[j - 1] + curr[j + 1] + next[j]);
