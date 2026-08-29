@@ -38,21 +38,26 @@ public:
 void apply_stencil(const Grid& old_grid, Grid& new_grid){
   const std::size_t numRows = old_grid.rows();
   const std::size_t numCols = old_grid.cols();
+  const double* oldData = old_grid.data();
+  double* newData = new_grid.data();
 
   // copy boundary points from old_grid unchanged
+
+  // leftmost/rightmost columns
   for(std::size_t i = 0; i < numRows; ++i){
-    new_grid(i, 0) = old_grid(i, 0);
-    new_grid(i, numCols - 1) = old_grid(i, numCols - 1);
+    const std::size_t rowStart = i * numCols;
+    newData[rowStart] = oldData[rowStart];
+    newData[rowStart + numCols - 1] = oldData[rowStart + numCols - 1]; 
   }
 
+  // top/bottom rows
+  const std::size_t bottomStart = (numRows - 1) * numCols;
   for(std::size_t j = 0; j < numCols; ++j){
-    new_grid(0, j) = old_grid(0, j);
-    new_grid(numRows - 1, j) = old_grid(numRows - 1, j);
+    newData[j] = oldData[j];
+    newData[bottomStart + j] = oldData[bottomStart + j];
   }
 
   // calculate new_grid interior points using weighted average
-  const double* oldData = old_grid.data();
-  double* newData = new_grid.data();
 
   for(std::size_t i = 1; i < numRows - 1; ++i){
     const double* prev = oldData + (i - 1) * numCols;
