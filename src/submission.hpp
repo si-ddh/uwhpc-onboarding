@@ -58,14 +58,12 @@ void apply_stencil(const Grid& old_grid, Grid& new_grid){
   }
 
   // calculate new_grid interior points using weighted average
-  #pragma omp parallel for schedule(static)
+  #pragma omp parallel for
   for(std::size_t i = 1; i < numRows - 1; ++i){
     const double* prev = oldData + (i - 1) * numCols;
     const double* curr = oldData + i * numCols;
     const double* next = oldData + (i + 1) * numCols;
     double* out = newData + i * numCols;
-
-    #pragma omp simd
     for(std::size_t j = 1; j < numCols - 1; ++j){
       out[j] = 0.5 * curr[j]
               + 0.125 * (prev[j] + curr[j - 1] + curr[j + 1] + next[j]);
